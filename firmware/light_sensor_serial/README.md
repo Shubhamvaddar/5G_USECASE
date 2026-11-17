@@ -9,7 +9,7 @@ This firmware reads a BH1750 light sensor on the ESP32 and prints one line per s
 - BH1750 VCC -> 3.3 V (or the breakout board's supported supply)
 - BH1750 GND -> ESP32 GND
 
-The firmware probes both BH1750 I2C addresses (`0x23` and `0x5C`). It prints readings as `Light: <lux> lx` at 9600 baud, which matches the SolarTwin laptop collector configuration (`LIGHT_PORT=COM20`, `LIGHT_BAUDRATE=9600`).
+The firmware probes both BH1750 I2C addresses (`0x23` and `0x5C`). It triggers a fresh one-shot high-resolution conversion for each sample, then prints `Light: <lux> lx (raw=<count>)` at 9600 baud. The raw count helps diagnose sensor changes. This matches the SolarTwin laptop collector configuration (`LIGHT_PORT=COM20`, `LIGHT_BAUDRATE=9600`).
 
 ## Build and upload
 
