@@ -1,6 +1,6 @@
-# Serial-only BH1750 light sensor firmware
+# SolarTwin Wi-Fi light node
 
-This firmware reads a BH1750 light sensor on the ESP32 and prints one line per sample over USB serial. It does not require Wi-Fi.
+The ESP32 reads a BH1750 over I²C and posts real lux readings directly to the VM over Wi-Fi. The laptop collector is not part of this path.
 
 ## Wiring
 
@@ -9,15 +9,19 @@ This firmware reads a BH1750 light sensor on the ESP32 and prints one line per s
 - BH1750 VCC -> 3.3 V (or the breakout board's supported supply)
 - BH1750 GND -> ESP32 GND
 
-The firmware probes both BH1750 I2C addresses (`0x23` and `0x5C`). It triggers a fresh one-shot high-resolution conversion for each sample, then prints `Light: <lux> lx (raw=<count>)` at 9600 baud. The raw count helps diagnose sensor changes. This matches the SolarTwin laptop collector configuration (`LIGHT_PORT=COM20`, `LIGHT_BAUDRATE=9600`).
+The firmware probes BH1750 addresses `0x23` and `0x5C`, takes a fresh one-shot high-resolution reading every five seconds, and posts JSON to `http://172.16.0.188:8000/api/sensors/data` with `node`, `light_lux`, and `source: real` fields.
+
+## Wi-Fi credentials
+
+Copy `src/wifi_secrets.example.h` to `src/wifi_secrets.h` and fill in the 2.4 GHz SSID and password. The real credentials file is ignored by Git; never commit it. Use a network that can reach the VM at `172.16.0.188`.
 
 ## Build and upload
 
-From this folder, use PlatformIO with the `espressif32` platform:
+From this folder:
 
 ```powershell
 platformio run
 platformio run --target upload --upload-port COM20
 ```
 
-The USB serial port must be free before uploading. Stop the laptop collector while flashing, then start it again afterward.
+Stop any process using COM20 before uploading. The serial console runs at 9600 baud and reports Wi-Fi connection and VM HTTP status. After upload, the ESP32 sends readings directly to the VM; it no longer needs the laptop collector.

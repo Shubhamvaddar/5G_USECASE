@@ -13,3 +13,6 @@ __pycache__/
 .venv/
 venv/
 node_modules/
+
+firmware/light_sensor_serial/src/wifi_secrets.h
+firmware/light_sensor_serial/.pio/
